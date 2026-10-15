@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Kertolaskukisa</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0d1230; }
+    #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none;
+                    background: linear-gradient(to top, #0d1230, #2b1c5c); }
+    #lataus { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+              gap: 22px; font-family: "Segoe UI", system-ui, sans-serif; color: #f4f4ff;
+              background: radial-gradient(circle at 50% 35%, #3a2a7a 0%, #1a1748 45%, #0d1230 100%); transition: opacity .4s; }
+    #lataus h1 { margin: 0; font-size: clamp(36px, 8vw, 84px); font-weight: 800; letter-spacing: 1px;
+                 background: linear-gradient(180deg, #ffd24d 10%, #ff7399 60%, #a873ff 100%);
+                 -webkit-background-clip: text; background-clip: text; color: transparent;
+                 filter: drop-shadow(0 4px 0 #1e0f3c); }
+    #lataus p { margin: 0; color: #aeb3db; font-size: 18px; }
+    #palkki { width: min(420px, 70vw); height: 14px; border-radius: 7px; background: rgba(255,255,255,.12); overflow: hidden; }
+    #tayte { width: 0; height: 100%; border-radius: 7px; background: linear-gradient(90deg, #4cdb80, #ffd24d); transition: width .2s; }
+    .merkki { position: absolute; color: rgba(255,255,255,.07); font-weight: 800; animation: nouse 9s linear infinite; }
+    @keyframes nouse { from { transform: translateY(40vh) rotate(-10deg); } to { transform: translateY(-60vh) rotate(15deg); } }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="lataus">
+    <span class="merkki" style="left:12%;font-size:80px">7</span>
+    <span class="merkki" style="left:80%;font-size:110px;animation-delay:-3s">×</span>
+    <span class="merkki" style="left:62%;font-size:60px;animation-delay:-6s">12</span>
+    <h1>Kertolaskukisa</h1>
+    <div id="palkki"><div id="tayte"></div></div>
+    <p id="teksti">Ladataan peliä…</p>
+  </div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var config = {
+      dataUrl: "Build/WebGL.data.unityweb",
+      frameworkUrl: "Build/WebGL.framework.js.unityweb",
+      codeUrl: "Build/WebGL.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "kijuku",
+      productName: "Kertolaskukisa",
+      productVersion: "1.0",
+      autoSyncPersistentDataPath: true, // tallennukset (kunniataulu) synkronoituvat selaimeen automaattisesti
+      // Terävä kuva myös tarkoilla näytöillä, mutta enintään 2× (puhelimet pysyvät sujuvina).
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+    };
+    var tayte = document.querySelector("#tayte");
+    var teksti = document.querySelector("#teksti");
+    var lataus = document.querySelector("#lataus");
+    var skripti = document.createElement("script");
+    skripti.src = "Build/WebGL.loader.js";
+    skripti.onload = function () {
+      createUnityInstance(canvas, config, function (osuus) {
+        tayte.style.width = (100 * osuus) + "%";
+      }).then(function () {
+        lataus.style.opacity = 0;
+        setTimeout(function () { lataus.remove(); }, 450);
+        canvas.focus();
+      }).catch(function (virhe) {
+        teksti.textContent = "Peliä ei voitu käynnistää: " + virhe;
+      });
+    };
+    document.body.appendChild(skripti);
+    // Näppäimistön syöte peliin myös, kun käyttäjä klikkaa sivua.
+    window.addEventListener("pointerdown", function () { canvas.focus(); });
+  </script>
+</body>
+</html>
