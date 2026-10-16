@@ -5,6 +5,8 @@
 Kertotaulut 2–12 nopeuskisana – kuka laskee nopeimmin? Toimii tietokoneella, tabletilla ja
 Chromebookilla ilman asennusta.
 
+Tarkempi ohje: **[PELIOHJE.md](PELIOHJE.md)**
+
 ## Pelitavat
 
 | Pelitapa | Tavoite |
