@@ -54,7 +54,15 @@
     skripti.onload = function () {
       createUnityInstance(canvas, config, function (osuus) {
         tayte.style.width = (100 * osuus) + "%";
-      }).then(function () {
+      }).then(function (peli) {
+        // Selaimen zoomaus (Ctrl + / −) tai siirto toiselle näytölle muuttaa pikselisuhdetta:
+        // päivitetään se peliin, ettei kuva jää sumeaksi tai turhan raskaaksi.
+        function seuraaDpr() {
+          var dpr = window.devicePixelRatio || 1;
+          peli.Module.devicePixelRatio = Math.min(dpr, 2);
+          window.matchMedia("(resolution: " + dpr + "dppx)").addEventListener("change", seuraaDpr, { once: true });
+        }
+        seuraaDpr();
         lataus.style.opacity = 0;
         setTimeout(function () { lataus.remove(); }, 450);
         canvas.focus();
